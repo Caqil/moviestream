@@ -1,236 +1,208 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { AuthGuard } from "@/components/auth/auth-guard";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  IconPlay,
-  IconHd,
   IconDevices,
   IconDownload,
   IconShield,
-  IconUsers,
-  IconTrendingUp,
   IconStar,
-  IconHeart,
+  IconUsers,
   IconClock,
-  IconArrowRight,
-  IconSparkles,
-  IconZap,
   IconCheck,
+  IconArrowRight,
+  IconQuote,
+  IconTrendingUp,
+  IconAward,
+  IconGlobe,
+  IconInfinity,
+  IconHeart,
+  IconCrown,
+  IconMovie,
 } from "@tabler/icons-react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { MainNavigation } from "@/components/layout/main-navigation";
+import { PlayIcon, ZapIcon } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "MovieStream - Your Ultimate Movie Streaming Platform",
   description:
-    "Stream unlimited movies and shows in HD quality. Start your free trial today and enjoy ad-free entertainment on any device.",
+    "Stream unlimited movies and shows in 4K quality. No ads, no limits, cancel anytime. Start your free trial today.",
 };
-
-// Demo data for featured content
-const featuredMovies = [
-  {
-    id: "1",
-    title: "Epic Adventure",
-    genre: "Action • Adventure",
-    rating: 8.7,
-    year: 2024,
-    duration: "2h 15m",
-    backdrop:
-      "https://images.unsplash.com/photo-1489599904152-3ef9518632e4?w=1200&h=675&fit=crop&q=80",
-    description:
-      "An epic adventure that takes you to the edge of the world and beyond. Experience stunning visuals and heart-pounding action.",
-    isPremium: true,
-  },
-  {
-    id: "2",
-    title: "Mystery of Tomorrow",
-    genre: "Sci-Fi • Thriller",
-    rating: 9.1,
-    year: 2024,
-    duration: "1h 58m",
-    backdrop:
-      "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=1200&h=675&fit=crop&q=80",
-    description:
-      "A mind-bending thriller that explores the mysteries of time and space. Prepare for an unforgettable journey.",
-    isPremium: false,
-  },
-  {
-    id: "3",
-    title: "Love in Paris",
-    genre: "Romance • Drama",
-    rating: 8.3,
-    year: 2024,
-    duration: "1h 42m",
-    backdrop:
-      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=1200&h=675&fit=crop&q=80",
-    description:
-      "A beautiful love story set against the romantic backdrop of Paris. Experience passion, heartbreak, and redemption.",
-    isPremium: true,
-  },
-];
-
-const popularMovies = [
-  {
-    id: "4",
-    title: "Action Hero",
-    poster:
-      "https://images.unsplash.com/photo-1478720568477-b2709d26d04e?w=300&h=450&fit=crop&q=80",
-    rating: 8.5,
-  },
-  {
-    id: "5",
-    title: "Space Odyssey",
-    poster:
-      "https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=300&h=450&fit=crop&q=80",
-    rating: 9.2,
-  },
-  {
-    id: "6",
-    title: "Comedy Gold",
-    poster:
-      "https://images.unsplash.com/photo-1489599904152-3ef9518632e4?w=300&h=450&fit=crop&q=80",
-    rating: 7.8,
-  },
-  {
-    id: "7",
-    title: "Horror Night",
-    poster:
-      "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=300&h=450&fit=crop&q=80",
-    rating: 8.1,
-  },
-  {
-    id: "8",
-    title: "Drama Classic",
-    poster:
-      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=300&h=450&fit=crop&q=80",
-    rating: 8.9,
-  },
-  {
-    id: "9",
-    title: "Fantasy World",
-    poster:
-      "https://images.unsplash.com/photo-1478720568477-b2709d26d04e?w=300&h=450&fit=crop&q=80",
-    rating: 8.6,
-  },
-];
-
-const features = [
-  {
-    icon: IconHd,
-    title: "HD & 4K Quality",
-    description: "Crystal clear streaming in HD, Full HD, and 4K resolution",
-  },
-  {
-    icon: IconDevices,
-    title: "Any Device",
-    description: "Watch on TV, laptop, phone, and tablet seamlessly",
-  },
-  {
-    icon: IconDownload,
-    title: "Offline Viewing",
-    description: "Download movies and shows to watch offline anywhere",
-  },
-  {
-    icon: IconShield,
-    title: "Ad-Free",
-    description: "Enjoy uninterrupted streaming without any advertisements",
-  },
-  {
-    icon: IconUsers,
-    title: "Family Profiles",
-    description: "Create up to 5 profiles with personalized recommendations",
-  },
-  {
-    icon: IconZap,
-    title: "Instant Streaming",
-    description:
-      "Start watching immediately with our fast streaming technology",
-  },
-];
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <MainNavigation />
-
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative">
-        <HeroSection />
-      </section>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background with gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:64px_64px]" />
 
-      {/* Featured Content */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Featured Movies</h2>
-              <p className="text-muted-foreground">
-                Handpicked movies just for you
+        {/* Floating elements */}
+        <div className="absolute top-20 left-10 w-32 h-32 bg-primary/10 rounded-full blur-xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-48 h-48 bg-secondary/10 rounded-full blur-2xl animate-pulse delay-1000" />
+
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <div className="max-w-4xl mx-auto space-y-8">
+            {/* Announcement Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm font-medium">
+              <ZapIcon className="h-4 w-4 text-primary" />
+              New: 4K streaming now available
+              <Badge variant="secondary" className="text-xs">
+                Limited Time
+              </Badge>
+            </div>
+
+            {/* Main Headline */}
+            <div className="space-y-6">
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+                Stream Unlimited
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">
+                  {" "}
+                  Movies
+                </span>
+                <br />
+                Anywhere, Anytime
+              </h1>
+
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Discover millions of movies and shows in stunning 4K quality. No
+                ads, no interruptions, just pure entertainment.
               </p>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/movies">
-                View All
-                <IconArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
 
-          <Suspense fallback={<FeaturedMoviesSkeleton />}>
-            <FeaturedMovies movies={featuredMovies} />
-          </Suspense>
-        </div>
-      </section>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-6 h-auto shadow-lg hover:shadow-xl transition-shadow"
+                asChild
+              >
+                <Link href="/auth/register">
+                  <PlayIcon className="mr-2 h-5 w-5" />
+                  Start Free Trial
+                </Link>
+              </Button>
 
-      {/* Popular Movies */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">Popular Now</h2>
-              <p className="text-muted-foreground">What everyone's watching</p>
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-6 h-auto"
+                asChild
+              >
+                <Link href="/movies">
+                  <IconMovie className="mr-2 h-5 w-5" />
+                  Browse Movies
+                </Link>
+              </Button>
             </div>
-            <Button variant="outline" asChild>
-              <Link href="/movies/popular">
-                View All
-                <IconArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
 
-          <Suspense fallback={<PopularMoviesSkeleton />}>
-            <PopularMoviesGrid movies={popularMovies} />
-          </Suspense>
+            {/* Trust Indicators */}
+            <div className="pt-8 text-sm text-muted-foreground">
+              <div className="flex flex-wrap justify-center items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <IconUsers className="h-4 w-4" />
+                  <span>10M+ Active Users</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <IconStar className="h-4 w-4 text-yellow-500" />
+                  <span>4.8/5 Rating</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <IconShield className="h-4 w-4 text-green-500" />
+                  <span>Secure & Private</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center">
+            <div className="w-1 h-3 bg-muted-foreground/30 rounded-full mt-2 animate-pulse" />
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Choose MovieStream?</h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Experience the future of entertainment with our cutting-edge
-              streaming platform
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Everything You Need for the Perfect Streaming Experience
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Premium features designed to give you the best movie watching
+              experience possible.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-0 bg-card/50 backdrop-blur">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg">
-                      <feature.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold text-lg">{feature.title}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: IconDevices,
+                title: "Watch Anywhere",
+                description:
+                  "Stream on any device - TV, laptop, tablet, or phone. Pick up where you left off.",
+                gradient: "from-blue-500 to-cyan-500",
+              },
+              {
+                icon: IconDownload,
+                title: "Offline Downloads",
+                description:
+                  "Download your favorites and watch offline. Perfect for travel or limited internet.",
+                gradient: "from-green-500 to-emerald-500",
+              },
+              {
+                icon: IconShield,
+                title: "Ad-Free Experience",
+                description:
+                  "No interruptions, no ads. Just pure, uninterrupted entertainment.",
+                gradient: "from-purple-500 to-pink-500",
+              },
+              {
+                icon: IconInfinity,
+                title: "Unlimited Streaming",
+                description:
+                  "Watch as much as you want, whenever you want. No limits, no restrictions.",
+                gradient: "from-orange-500 to-red-500",
+              },
+              {
+                icon: IconAward,
+                title: "4K Ultra HD",
+                description:
+                  "Crystal clear picture quality with HDR support for the ultimate viewing experience.",
+                gradient: "from-indigo-500 to-purple-500",
+              },
+              {
+                icon: IconGlobe,
+                title: "Global Content",
+                description:
+                  "Movies and shows from around the world with subtitles in multiple languages.",
+                gradient: "from-teal-500 to-green-500",
+              },
+            ].map((feature, index) => (
+              <Card
+                key={index}
+                className="group hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/50"
+              >
+                <CardHeader className="pb-4">
+                  <div
+                    className={cn(
+                      "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
+                      "bg-gradient-to-br",
+                      feature.gradient,
+                      "group-hover:scale-110 transition-transform duration-300"
+                    )}
+                  >
+                    <feature.icon className="h-6 w-6 text-white" />
                   </div>
+                  <CardTitle className="text-xl">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -239,302 +211,288 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16">
+      {/* Stats Section */}
+      <section className="py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-sm text-primary mb-6">
-              <IconSparkles className="h-4 w-4" />
-              Start Your Journey Today
-            </div>
-
-            <h2 className="text-4xl font-bold mb-4">
-              Ready to Stream Unlimited Entertainment?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join millions of movie lovers and start your free trial today.
-              Cancel anytime, no commitment required.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="text-lg px-8" asChild>
-                <Link href="/auth/register">
-                  Start Free Trial
-                  <IconPlay className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8"
-                asChild
-              >
-                <Link href="/movies">Browse Movies</Link>
-              </Button>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <IconCheck className="h-4 w-4 text-green-500" />
-                7-day free trial
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { number: "50K+", label: "Movies & Shows", icon: IconMovie },
+              { number: "10M+", label: "Happy Users", icon: IconUsers },
+              { number: "190+", label: "Countries", icon: IconGlobe },
+              { number: "99.9%", label: "Uptime", icon: IconTrendingUp },
+            ].map((stat, index) => (
+              <div key={index} className="text-center group">
+                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <stat.icon className="h-8 w-8 text-primary" />
+                </div>
+                <div className="text-3xl md:text-4xl font-bold mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-muted-foreground">{stat.label}</div>
               </div>
-              <div className="flex items-center gap-2">
-                <IconCheck className="h-4 w-4 text-green-500" />
-                Cancel anytime
-              </div>
-              <div className="flex items-center gap-2">
-                <IconCheck className="h-4 w-4 text-green-500" />
-                No commitment
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-muted/50 border-t py-12">
+      {/* Testimonials Section */}
+      <section className="py-24 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center mb-8">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
-                <IconPlay className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl">MovieStream</span>
-            </Link>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Loved by Movie Enthusiasts Worldwide
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              See what our users have to say about their MovieStream experience.
+            </p>
           </div>
 
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 MovieStream. All rights reserved.</p>
-            <div className="flex items-center justify-center gap-6 mt-4">
-              <Link
-                href="/privacy"
-                className="hover:text-foreground transition-colors"
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                quote:
+                  "The best streaming service I've ever used. The quality is incredible and the selection is unmatched.",
+                author: "Sarah Johnson",
+                role: "Movie Enthusiast",
+                avatar: "/api/placeholder/64/64",
+                rating: 5,
+              },
+              {
+                quote:
+                  "Love being able to download movies for my flights. The offline feature is a game-changer.",
+                author: "Michael Chen",
+                role: "Frequent Traveler",
+                avatar: "/api/placeholder/64/64",
+                rating: 5,
+              },
+              {
+                quote:
+                  "Finally, a streaming service without ads! Worth every penny for the uninterrupted experience.",
+                author: "Emily Rodriguez",
+                role: "Binge Watcher",
+                avatar: "/api/placeholder/64/64",
+                rating: 5,
+              },
+            ].map((testimonial, index) => (
+              <Card
+                key={index}
+                className="border-0 bg-background/50 backdrop-blur"
               >
-                Privacy Policy
-              </Link>
-              <Link
-                href="/terms"
-                className="hover:text-foreground transition-colors"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="/help"
-                className="hover:text-foreground transition-colors"
-              >
-                Help Center
-              </Link>
-            </div>
+                <CardContent className="pt-6">
+                  <div className="flex mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <IconStar
+                        key={i}
+                        className="h-5 w-5 text-yellow-500 fill-current"
+                      />
+                    ))}
+                  </div>
+
+                  <div className="mb-6">
+                    <IconQuote className="h-8 w-8 text-primary/20 mb-4" />
+                    <p className="text-lg leading-relaxed">
+                      {testimonial.quote}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center">
+                    <Avatar className="h-12 w-12 mr-4">
+                      <AvatarImage
+                        src={testimonial.avatar}
+                        alt={testimonial.author}
+                      />
+                      <AvatarFallback>
+                        {testimonial.author.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-semibold">{testimonial.author}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {testimonial.role}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
-      </footer>
-    </div>
-  );
-}
+      </section>
 
-function HeroSection() {
-  return (
-    <div className="relative min-h-[70vh] flex items-center">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]" />
+      {/* Pricing Section */}
+      <section className="py-24">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Simple, Transparent Pricing
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Choose the plan that's right for you. Cancel anytime.
+            </p>
+          </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          <Badge variant="outline" className="mb-6 text-sm">
-            <IconTrendingUp className="h-3 w-3 mr-1" />
-            #1 Streaming Platform
-          </Badge>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                name: "Basic",
+                price: "$8.99",
+                description: "Perfect for individuals",
+                features: [
+                  "HD streaming",
+                  "1 device",
+                  "Unlimited movies",
+                  "Cancel anytime",
+                ],
+                popular: false,
+              },
+              {
+                name: "Standard",
+                price: "$13.99",
+                description: "Great for families",
+                features: [
+                  "Full HD streaming",
+                  "2 devices simultaneously",
+                  "Download for offline",
+                  "No ads",
+                  "Cancel anytime",
+                ],
+                popular: true,
+              },
+              {
+                name: "Premium",
+                price: "$17.99",
+                description: "Ultimate experience",
+                features: [
+                  "4K Ultra HD streaming",
+                  "4 devices simultaneously",
+                  "Download for offline",
+                  "No ads",
+                  "Priority support",
+                  "Cancel anytime",
+                ],
+                popular: false,
+              },
+            ].map((plan, index) => (
+              <Card
+                key={index}
+                className={cn(
+                  "relative border-2 transition-all duration-300 hover:shadow-xl",
+                  plan.popular
+                    ? "border-primary shadow-lg scale-105"
+                    : "border-border hover:border-primary/50"
+                )}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <Badge className="px-4 py-2 bg-primary text-primary-foreground">
+                      <IconCrown className="h-4 w-4 mr-1" />
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Stream Unlimited
-            <br />
-            Entertainment
-          </h1>
+                <CardHeader className="text-center pb-8">
+                  <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                  <div className="text-4xl font-bold mt-4">
+                    {plan.price}
+                    <span className="text-lg font-normal text-muted-foreground">
+                      /month
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground mt-2">
+                    {plan.description}
+                  </p>
+                </CardHeader>
 
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Watch thousands of movies and shows in stunning HD quality. Start
-            your free trial and enjoy ad-free streaming on any device.
-          </p>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, featureIndex) => (
+                      <li key={featureIndex} className="flex items-center">
+                        <IconCheck className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="text-lg px-8" asChild>
-              <Link href="/auth/register">
-                Start Free Trial
-                <IconPlay className="ml-2 h-5 w-5" />
+                  <Button
+                    className={cn(
+                      "w-full mt-8",
+                      plan.popular ? "bg-primary" : "variant-outline"
+                    )}
+                    variant={plan.popular ? "default" : "outline"}
+                    size="lg"
+                    asChild
+                  >
+                    <Link
+                      href={`/auth/register?plan=${plan.name.toLowerCase()}`}
+                    >
+                      Get Started
+                      <IconArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">
+              All plans include a 30-day free trial. No commitment required.
+            </p>
+            <Button variant="ghost" asChild>
+              <Link href="/pricing">
+                View detailed comparison
+                <IconArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="text-lg px-8"
-              asChild
-            >
-              <Link href="/movies">Browse Movies</Link>
-            </Button>
-          </div>
-
-          <div className="flex items-center justify-center gap-8 mt-12 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <IconHd className="h-4 w-4" />
-              HD & 4K Quality
-            </div>
-            <div className="flex items-center gap-2">
-              <IconDevices className="h-4 w-4" />
-              Any Device
-            </div>
-            <div className="flex items-center gap-2">
-              <IconShield className="h-4 w-4" />
-              Ad-Free
-            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
+      </section>
 
-function FeaturedMovies({ movies }: { movies: typeof featuredMovies }) {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {movies.map((movie, index) => (
-        <Card
-          key={movie.id}
-          className={cn(
-            "group cursor-pointer overflow-hidden border-0 bg-card/50 backdrop-blur transition-all duration-300 hover:scale-[1.02] hover:shadow-xl",
-            index === 0 && "lg:col-span-2 lg:row-span-2"
-          )}
-        >
-          <div className="relative">
-            <img
-              src={movie.backdrop}
-              alt={movie.title}
-              className="w-full h-48 lg:h-60 object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-
-            {/* Play Button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="icon" className="w-16 h-16 rounded-full">
-                <IconPlay className="h-6 w-6" />
-              </Button>
-            </div>
-
-            {/* Premium Badge */}
-            {movie.isPremium && (
-              <Badge className="absolute top-4 right-4 bg-primary">
-                Premium
-              </Badge>
-            )}
-          </div>
-
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex items-center gap-1">
-                <IconStar className="h-4 w-4 text-yellow-500 fill-current" />
-                <span className="font-medium">{movie.rating}</span>
-              </div>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">{movie.year}</span>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground">{movie.duration}</span>
-            </div>
-
-            <h3 className="font-bold text-xl mb-2">{movie.title}</h3>
-            <p className="text-muted-foreground text-sm mb-3">{movie.genre}</p>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {movie.description}
+      {/* CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-primary to-primary/80">
+        <div className="container mx-auto px-4 text-center text-primary-foreground">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Ready to Start Your Movie Journey?
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Join millions of users who have already discovered their new
+              favorite streaming platform.
             </p>
 
-            <div className="flex items-center gap-2 mt-4">
-              <Button size="sm" className="flex-1">
-                <IconPlay className="h-4 w-4 mr-2" />
-                Watch Now
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="text-lg px-8 py-6 h-auto"
+                asChild
+              >
+                <Link href="/auth/register">
+                  Start Free Trial
+                  <IconArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              <Button size="sm" variant="outline">
-                <IconHeart className="h-4 w-4" />
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
 
-function PopularMoviesGrid({ movies }: { movies: typeof popularMovies }) {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {movies.map((movie) => (
-        <Card
-          key={movie.id}
-          className="group cursor-pointer overflow-hidden border-0 bg-card/50 backdrop-blur transition-all duration-300 hover:scale-105 hover:shadow-lg"
-        >
-          <div className="relative">
-            <img
-              src={movie.poster}
-              alt={movie.title}
-              className="w-full aspect-[2/3] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-            {/* Play Button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="icon" className="w-12 h-12 rounded-full">
-                <IconPlay className="h-4 w-4" />
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-lg px-8 py-6 h-auto border-white/20 text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href="/contact">Contact Sales</Link>
               </Button>
             </div>
 
-            {/* Rating */}
-            <div className="absolute top-2 left-2 flex items-center gap-1 bg-black/50 rounded px-2 py-1">
-              <IconStar className="h-3 w-3 text-yellow-500 fill-current" />
-              <span className="text-white text-xs font-medium">
-                {movie.rating}
-              </span>
+            <div className="mt-8 text-sm opacity-75">
+              <p>
+                No credit card required • Cancel anytime • 30-day money-back
+                guarantee
+              </p>
             </div>
           </div>
-
-          <CardContent className="p-3">
-            <h4 className="font-medium text-sm truncate">{movie.title}</h4>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function FeaturedMoviesSkeleton() {
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {[1, 2, 3].map((i) => (
-        <Card
-          key={i}
-          className={cn("overflow-hidden", i === 1 && "lg:col-span-2")}
-        >
-          <Skeleton className="w-full h-48 lg:h-60" />
-          <CardContent className="p-6 space-y-3">
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-16 w-full" />
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-}
-
-function PopularMoviesSkeleton() {
-  return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <Card key={i} className="overflow-hidden">
-          <Skeleton className="w-full aspect-[2/3]" />
-          <CardContent className="p-3">
-            <Skeleton className="h-4 w-full" />
-          </CardContent>
-        </Card>
-      ))}
+        </div>
+      </section>
     </div>
   );
 }
