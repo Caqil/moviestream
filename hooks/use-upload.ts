@@ -1,5 +1,5 @@
+import { UploadResponse } from '@/types/api';
 import { useState, useCallback } from 'react';
-import { UploadResponse, FileUploadRequest } from '@/types';
 
 export function useUpload() {
   const [isUploading, setIsUploading] = useState(false);

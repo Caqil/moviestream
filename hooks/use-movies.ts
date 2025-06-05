@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Movie, Genre, MovieSearchFilters, PaginatedResponse } from '@/types';
+import { Movie, Genre, MovieSearchFilters } from '@/types';
+import { PaginatedResponse } from '@/types/api';
 
 export function useMovies() {
   const [movies, setMovies] = useState<Movie[]>([]);

@@ -80,4 +80,3 @@ export interface CheckoutSession {
   planId: Types.ObjectId;
   customerId?: string;
 }
-

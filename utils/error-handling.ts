@@ -1,7 +1,7 @@
 
+import { ApiResponse, ErrorResponse, ValidationError } from '@/types/api';
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { ApiResponse, ErrorResponse, ValidationError } from '@/types';
 
 export class AppError extends Error {
   public statusCode: number;

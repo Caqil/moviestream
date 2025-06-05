@@ -3,8 +3,9 @@ import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { UploadResponse, FileUploadRequest, S3Settings } from '@/types';
 import { ErrorHandler, AppError } from './error-handling';
+import { UploadResponse } from '@/types/api';
+import { S3Settings } from '@/types';
 
 export class FileUploadUtils {
   private static s3Client: S3Client | null = null;

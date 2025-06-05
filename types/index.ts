@@ -1,12 +1,12 @@
 import { Types } from 'mongoose';
 
+// Re-export all types from individual files
 export * from './user';
 export * from './movie';
 export * from './subscription';
 export * from './device';
 export * from './auth';
 export * from './admin';
-export * from './api';
 
 // Common utility types
 export type ID = string | Types.ObjectId;
@@ -69,4 +69,49 @@ export interface UsePaginationResult<T = any> {
   prevPage: () => void;
   goToPage: (page: number) => void;
   refetch: () => Promise<void>;
+}
+
+// Additional utility types
+export interface FileUploadOptions {
+  maxSize?: number;
+  allowedTypes?: string[];
+  allowedExtensions?: string[];
+}
+
+export interface ValidationResult {
+  isValid: boolean;
+  errors: Record<string, string>;
+}
+
+export interface ServiceStatus {
+  tmdb: boolean;
+  stripe: boolean;
+  s3: boolean;
+  email: boolean;
+}
+
+export interface UserSession {
+  deviceId: Types.ObjectId;
+  deviceName: string;
+  deviceType: DeviceType;
+  location?: string;
+  lastActivity: Date;
+  isActive: boolean;
+}
+
+export interface PlayerState {
+  currentTime: number;
+  duration: number;
+  paused: boolean;
+  volume: number;
+  quality: VideoQuality;
+  subtitlesEnabled: boolean;
+  subtitleLanguage?: string;
+}
+
+export interface WatchProgress {
+  movieId: Types.ObjectId;
+  progress: number; // 0-100
+  lastPosition: number; // seconds
+  updatedAt: Date;
 }

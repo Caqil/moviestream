@@ -1,16 +1,8 @@
-
-
 import { Types } from 'mongoose';
 
 export interface AdminSettings {
   _id: Types.ObjectId;
-  siteName: string;
-  siteDescription: string;
-  siteUrl: string;
-  logo?: string;
-  favicon?: string;
-  contactEmail: string;
-  supportEmail: string;
+  general: GeneralSettings;
   tmdb: TMDBSettings;
   stripe: StripeSettings;
   s3: S3Settings;
@@ -22,6 +14,16 @@ export interface AdminSettings {
   maintenance: MaintenanceSettings;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface GeneralSettings {
+  siteName: string;
+  siteDescription: string;
+  siteUrl: string;
+  logo?: string;
+  favicon?: string;
+  contactEmail: string;
+  supportEmail: string;
 }
 
 export interface TMDBSettings {
@@ -114,28 +116,37 @@ export interface DashboardStats {
     active: number;
     new: number;
     subscribers: number;
+    growth?: number; // Month-over-month growth percentage
   };
   movies: {
     total: number;
     active: number;
     featured: number;
     premium: number;
+    growth?: number; // Month-over-month growth percentage
   };
   devices: {
     total: number;
     active: number;
     verified: number;
     blocked: number;
+    growth?: number; // Month-over-month growth percentage
   };
   revenue: {
     monthly: number;
     yearly: number;
-    growth: number;
+    thisMonth: number; // Current month revenue
+    growth?: number; // Month-over-month growth percentage
   };
   streaming: {
     activeSessions: number;
     totalViews: number;
     averageWatchTime: number;
+  };
+  storage?: {
+    used: number; // Bytes used
+    total: number; // Total bytes available
+    growth?: number; // Month-over-month growth percentage
   };
 }
 
@@ -164,4 +175,10 @@ export interface UpdateSettingsRequest {
   security?: Partial<SecuritySettings>;
   features?: Partial<FeatureSettings>;
   deviceManagement?: Partial<DeviceManagementSettings>;
+}
+
+export interface BulkActionRequest {
+  ids: Types.ObjectId[];
+  action: string;
+  data?: Record<string, any>;
 }

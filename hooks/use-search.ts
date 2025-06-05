@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Movie, Genre, SearchRequest, PaginatedResponse } from '@/types';
+import { Movie, Genre } from '@/types';
+import { PaginatedResponse, SearchRequest } from '@/types/api';
 
 export function useSearch() {
   const [results, setResults] = useState<Movie[]>([]);

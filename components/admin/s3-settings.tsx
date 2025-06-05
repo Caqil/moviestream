@@ -386,7 +386,7 @@ export function S3Settings() {
               </div>
             </div>
 
-            {(formData.provider !== "aws" || formData.provider === "other") && (
+            {formData.provider !== "aws" && (
               <div className="space-y-2">
                 <Label htmlFor="s3-endpoint">Custom Endpoint</Label>
                 <Input
