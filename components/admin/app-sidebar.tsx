@@ -1,28 +1,35 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
-  IconCamera,
-  IconChartBar,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
-  IconReport,
-  IconSearch,
-  IconSettings,
+  IconMovie,
   IconUsers,
-} from "@tabler/icons-react"
+  IconDevices,
+  IconChartBar,
+  IconSettings,
+  IconCurrencyDollar,
+  IconCloud,
+  IconMail,
+  IconDatabase,
+  IconShield,
+  IconHelp,
+  IconBell,
+  IconUpload,
+  IconFile,
+  IconEye,
+  IconCreditCard,
+  IconKey,
+  IconBrandStripe,
+  IconBrandAws,
+  IconApi,
+  IconInnerShadowTop,
+} from "@tabler/icons-react";
 
-import { NavDocuments } from "@/components/nav-documents"
-import { NavMain } from "@/components/nav-main"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+import { NavDocuments } from "@/components/admin/nav-documents";
+import { NavMain } from "@/components/admin/nav-main";
+import { NavSecondary } from "@/components/admin/nav-secondary";
+import { NavUser } from "@/components/admin/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -31,128 +38,134 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
-    {
-      title: "Lifecycle",
-      url: "#",
-      icon: IconListDetails,
-    },
-    {
-      title: "Analytics",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Projects",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Team",
-      url: "#",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
-  ],
-}
+} from "@/components/ui/sidebar";
+import { useAuthContext } from "@/contexts/auth-context";
+import { useAdminContext } from "@/contexts/admin-context";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuthContext();
+  const { settings, stats } = useAdminContext();
+
+  const data = {
+    user: user
+      ? {
+          name: user.name,
+          email: user.email,
+          avatar: user.image || "",
+        }
+      : {
+          name: "Admin User",
+          email: "admin@moviestream.com",
+          avatar: "",
+        },
+    navMain: [
+      {
+        title: "Dashboard",
+        url: "/admin",
+        icon: IconDashboard,
+      },
+      {
+        title: "Movies",
+        url: "/admin/movies",
+        icon: IconMovie,
+      },
+      {
+        title: "Users",
+        url: "/admin/users",
+        icon: IconUsers,
+      },
+      {
+        title: "Subscriptions",
+        url: "/admin/subscriptions",
+        icon: IconCurrencyDollar,
+      },
+      {
+        title: "Analytics",
+        url: "/admin/analytics",
+        icon: IconChartBar,
+      },
+      {
+        title: "Devices",
+        url: "/admin/devices",
+        icon: IconDevices,
+      },
+    ],
+    navServices: [
+      {
+        title: "Upload Manager",
+        icon: IconUpload,
+        url: "/admin/uploads",
+        description: "Manage file uploads",
+      },
+      {
+        title: "TMDB Integration",
+        icon: IconApi,
+        url: "/admin/settings/tmdb",
+        description: "Movie database API",
+      },
+      {
+        title: "Stripe Payments",
+        icon: IconBrandStripe,
+        url: "/admin/settings/stripe",
+        description: "Payment processing",
+      },
+      {
+        title: "S3 Storage",
+        icon: IconBrandAws,
+        url: "/admin/settings/s3",
+        description: "Cloud file storage",
+      },
+    ],
+    navSecondary: [
+      {
+        title: "System Settings",
+        url: "/admin/settings",
+        icon: IconSettings,
+      },
+      {
+        title: "Security",
+        url: "/admin/security",
+        icon: IconShield,
+      },
+      {
+        title: "Notifications",
+        url: "/admin/notifications",
+        icon: IconBell,
+      },
+      {
+        title: "Help & Support",
+        url: "/admin/help",
+        icon: IconHelp,
+      },
+    ],
+    documents: [
+      {
+        name: "Content Library",
+        url: "/admin/content",
+        icon: IconDatabase,
+      },
+      {
+        name: "Analytics Reports",
+        url: "/admin/reports",
+        icon: IconFile,
+      },
+      {
+        name: "Audit Logs",
+        url: "/admin/logs",
+        icon: IconEye,
+      },
+      {
+        name: "API Documentation",
+        url: "/admin/api-docs",
+        icon: IconKey,
+      },
+    ],
+  };
+
+  const platformName = settings?.general?.siteName || "MovieStream";
+
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -160,9 +173,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
+              <a href="/admin">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <span className="text-base font-semibold">
+                  {platformName} Admin
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -177,5 +192,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
