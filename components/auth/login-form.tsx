@@ -222,7 +222,7 @@ export function LoginForm({
               <Checkbox
                 id="remember"
                 checked={formData.rememberMe}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   handleInputChange("rememberMe", checked)
                 }
                 disabled={isFormLoading}

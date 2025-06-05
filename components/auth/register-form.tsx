@@ -418,7 +418,7 @@ export function RegisterForm({
               <Checkbox
                 id="terms"
                 checked={formData.acceptTerms}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   handleInputChange("acceptTerms", checked)
                 }
                 disabled={isFormLoading}
@@ -457,7 +457,7 @@ export function RegisterForm({
               <Checkbox
                 id="marketing"
                 checked={formData.acceptMarketing}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   handleInputChange("acceptMarketing", checked)
                 }
                 disabled={isFormLoading}

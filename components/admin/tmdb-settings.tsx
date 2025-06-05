@@ -214,7 +214,7 @@ export function TMDBSettings() {
               <Switch
                 id="tmdb-enabled"
                 checked={formData.isEnabled}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   setFormData((prev) => ({ ...prev, isEnabled: checked }))
                 }
               />

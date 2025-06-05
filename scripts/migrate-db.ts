@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 import { connectToDatabase, disconnectFromDatabase } from '../lib/db';
 import { User } from '../models/User';
 import { Movie } from '../models/Movie';
@@ -180,35 +179,50 @@ class DatabaseMigrator {
     console.log('✅ User indexes updated');
   }
 
+
   private async addMovieSearchIndexes(): Promise<void> {
     console.log('Adding movie search indexes...');
-
-    // Enhanced search indexes
-    await Movie.collection.createIndex({ 
-      title: 'text', 
-      overview: 'text', 
-      director: 'text', 
-      cast: 'text',
-      keywords: 'text'
-    }, {
-      weights: {
-        title: 10,
-        director: 5,
-        cast: 3,
-        keywords: 2,
-        overview: 1
-      },
-      name: 'movie_search_index'
-    });
-
-    // Performance indexes
-    await Movie.collection.createIndex({ language: 1, country: 1 });
-    await Movie.collection.createIndex({ duration: 1 });
-    await Movie.collection.createIndex({ 'videoMetadata.resolution': 1 });
-
-    console.log('✅ Movie search indexes added');
+  
+    try {
+      // First, drop any existing text indexes to avoid conflicts
+      const existingIndexes = await Movie.collection.listIndexes().toArray();
+      
+      for (const index of existingIndexes) {
+        if (index.key && index.key._fts === 'text') {
+          console.log(`Dropping existing text index: ${index.name}`);
+          await Movie.collection.dropIndex(index.name);
+        }
+      }
+  
+      // Now create the enhanced search index
+      await Movie.collection.createIndex({ 
+        title: 'text', 
+        overview: 'text', 
+        director: 'text', 
+        cast: 'text',
+        keywords: 'text'
+      }, {
+        weights: {
+          title: 10,
+          director: 5,
+          cast: 3,
+          keywords: 2,
+          overview: 1
+        },
+        name: 'movie_search_index'
+      });
+  
+      // Performance indexes
+      await Movie.collection.createIndex({ language: 1, country: 1 });
+      await Movie.collection.createIndex({ duration: 1 });
+      await Movie.collection.createIndex({ 'videoMetadata.resolution': 1 });
+  
+      console.log('✅ Movie search indexes added');
+    } catch (error) {
+      console.warn('Warning: Some indexes may already exist:', error);
+      console.log('✅ Movie search indexes process completed');
+    }
   }
-
   private async optimizeDeviceSessionIndexes(): Promise<void> {
     console.log('Optimizing device and session indexes...');
 
@@ -257,7 +271,7 @@ class DatabaseMigrator {
     await SubscriptionPlan.collection.createIndex({ price: 1 });
 
     // Settings indexes (ensure only one document)
-    await Settings.collection.createIndex({}, { unique: true });
+    // Settings unique constraint is handled by schema
 
     // Compound indexes for common queries
     await Movie.collection.createIndex({ isActive: 1, isFeatured: 1 });

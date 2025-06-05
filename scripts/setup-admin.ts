@@ -375,20 +375,18 @@ class AdminSetup {
       });
     });
   }
-
   private askPassword(question: string): Promise<string> {
     return new Promise((resolve) => {
-      // Hide password input
       const stdin = process.stdin;
       stdin.setRawMode?.(true);
       
       process.stdout.write(question);
       
       let password = '';
-      stdin.on('data', function handler(char) {
-        char = char.toString();
+      stdin.on('data', function handler(char: Buffer) {
+        const input = char.toString('utf8'); // Convert Buffer to string explicitly
         
-        switch (char) {
+        switch (input) {
           case '\n':
           case '\r':
           case '\u0004': // Ctrl-D
@@ -408,7 +406,7 @@ class AdminSetup {
             }
             break;
           default:
-            password += char;
+            password += input;
             process.stdout.write('*');
             break;
         }

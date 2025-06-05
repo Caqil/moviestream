@@ -389,7 +389,7 @@ export function PlanManager() {
                     <div className="flex gap-2">
                       <Select
                         value={formData.currency}
-                        onValueChange={(value) =>
+                        onValueChange={(value: any) =>
                           setFormData((prev) => ({ ...prev, currency: value }))
                         }
                       >
@@ -568,7 +568,7 @@ export function PlanManager() {
                       <Label>Download Allowed</Label>
                       <Switch
                         checked={formData.downloadAllowed}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             downloadAllowed: checked,
@@ -581,7 +581,7 @@ export function PlanManager() {
                       <Label>Offline Viewing</Label>
                       <Switch
                         checked={formData.offlineViewing}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             offlineViewing: checked,
@@ -594,7 +594,7 @@ export function PlanManager() {
                       <Label>Popular Plan</Label>
                       <Switch
                         checked={formData.isPopular}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             isPopular: checked,
@@ -609,7 +609,7 @@ export function PlanManager() {
                       <Label>Show Ads</Label>
                       <Switch
                         checked={formData.adsSupported}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             adsSupported: checked,
@@ -622,7 +622,7 @@ export function PlanManager() {
                       <Label>Device Kick Enabled</Label>
                       <Switch
                         checked={formData.deviceFeatures.deviceKickEnabled}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             deviceFeatures: {
@@ -638,7 +638,7 @@ export function PlanManager() {
                       <Label>Auto Verify Trusted</Label>
                       <Switch
                         checked={formData.deviceFeatures.autoVerifyTrusted}
-                        onCheckedChange={(checked) =>
+                        onCheckedChange={(checked: any) =>
                           setFormData((prev) => ({
                             ...prev,
                             deviceFeatures: {

@@ -190,7 +190,7 @@ export function StripeSettings() {
               <Switch
                 id="stripe-enabled"
                 checked={formData.isEnabled}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   setFormData((prev) => ({ ...prev, isEnabled: checked }))
                 }
               />

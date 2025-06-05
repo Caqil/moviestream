@@ -257,7 +257,7 @@ export function S3Settings() {
               <Switch
                 id="s3-enabled"
                 checked={formData.isEnabled}
-                onCheckedChange={(checked) =>
+                onCheckedChange={(checked: any) =>
                   setFormData((prev) => ({ ...prev, isEnabled: checked }))
                 }
               />
@@ -434,7 +434,7 @@ export function S3Settings() {
                 <Switch
                   id="force-path-style"
                   checked={formData.forcePathStyle}
-                  onCheckedChange={(checked) =>
+                  onCheckedChange={(checked: any) =>
                     setFormData((prev) => ({
                       ...prev,
                       forcePathStyle: checked,
