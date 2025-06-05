@@ -99,6 +99,8 @@ export function Pagination({
 
   const pageNumbers = pages > 1 ? generatePageNumbers() : [];
 
+  const currentLimit = limit || 10; // Provide default value
+
   if (variant === "simple") {
     return (
       <div className={cn("flex items-center justify-between", className)}>

@@ -33,30 +33,7 @@ import { RemoveDeviceDialog } from "@/components/common/confirmation-dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MonitorIcon, SmartphoneIcon, Table2Icon, Tv2Icon } from "lucide-react";
-
-interface Device {
-  _id: string;
-  deviceName: string;
-  deviceType: "web" | "mobile" | "tablet" | "tv" | "desktop" | "other";
-  platform: string;
-  browser?: string;
-  osVersion?: string;
-  ipAddress: string;
-  isVerified: boolean;
-  isTrusted: boolean;
-  isBlocked: boolean;
-  lastUsed: Date;
-  registeredAt: Date;
-  location?: {
-    country?: string;
-    city?: string;
-    region?: string;
-  };
-  metadata?: {
-    screenResolution?: string;
-    language?: string;
-  };
-}
+import { Device } from "@/types/device";
 
 interface DeviceCardProps {
   device: Device;
@@ -68,6 +45,7 @@ interface DeviceCardProps {
   variant?: "default" | "compact" | "detailed";
   className?: string;
   isCurrentDevice?: boolean;
+  onClick?: () => void;
 }
 
 export function DeviceCard({
@@ -80,6 +58,7 @@ export function DeviceCard({
   variant = "default",
   className,
   isCurrentDevice = false,
+  onClick,
 }: DeviceCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
@@ -145,15 +124,15 @@ export function DeviceCard({
     try {
       switch (action) {
         case "verify":
-          await onVerify?.(device._id);
+          await onVerify?.(device._id.toString());
           toast.success("Device verified successfully");
           break;
         case "block":
-          await onBlock?.(device._id);
+          await onBlock?.(device._id.toString());
           toast.success("Device blocked successfully");
           break;
         case "trust":
-          await onTrust?.(device._id);
+          await onTrust?.(device._id.toString());
           toast.success("Device trust status updated");
           break;
         case "remove":
@@ -169,7 +148,7 @@ export function DeviceCard({
 
   const handleRemoveConfirm = async () => {
     try {
-      await onRemove?.(device._id);
+      await onRemove?.(device._id.toString());
       toast.success("Device removed successfully");
       setShowRemoveDialog(false);
     } catch (error) {
@@ -183,8 +162,10 @@ export function DeviceCard({
         className={cn(
           "flex items-center justify-between p-3 border rounded-lg",
           isCurrentDevice && "bg-primary/5 border-primary/20",
+          onClick && "cursor-pointer hover:bg-muted/50",
           className
         )}
+        onClick={onClick}
       >
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-muted rounded-lg">{getDeviceIconSmall()}</div>
@@ -207,7 +188,11 @@ export function DeviceCard({
           {showActions && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <IconDots className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -243,8 +228,10 @@ export function DeviceCard({
           "relative",
           isCurrentDevice && "ring-2 ring-primary ring-offset-2",
           device.isBlocked && "opacity-60",
+          onClick && "cursor-pointer hover:shadow-md transition-shadow",
           className
         )}
+        onClick={onClick}
       >
         {isCurrentDevice && (
           <Badge variant="default" className="absolute -top-2 left-4 z-10">
@@ -283,7 +270,12 @@ export function DeviceCard({
               {showActions && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" disabled={isLoading}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={isLoading}
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <IconDots className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
@@ -418,7 +410,9 @@ export function DeviceCard({
         deviceName={device.deviceName}
         onConfirm={handleRemoveConfirm}
         disabled={isCurrentDevice}
-      />
+      >
+        <div />
+      </RemoveDeviceDialog>
     </>
   );
 }
@@ -429,9 +423,10 @@ export function DeviceCardCompact({
   onRemove,
   className,
   isCurrentDevice,
+  onClick,
 }: Pick<
   DeviceCardProps,
-  "device" | "onRemove" | "className" | "isCurrentDevice"
+  "device" | "onRemove" | "className" | "isCurrentDevice" | "onClick"
 >) {
   return (
     <DeviceCard
@@ -440,6 +435,7 @@ export function DeviceCardCompact({
       variant="compact"
       className={className}
       isCurrentDevice={isCurrentDevice}
+      onClick={onClick}
     />
   );
 }
@@ -452,6 +448,7 @@ export function DeviceCardDetailed({
   onTrust,
   className,
   isCurrentDevice,
+  onClick,
 }: DeviceCardProps) {
   return (
     <DeviceCard
@@ -463,6 +460,7 @@ export function DeviceCardDetailed({
       variant="detailed"
       className={className}
       isCurrentDevice={isCurrentDevice}
+      onClick={onClick}
     />
   );
 }

@@ -43,23 +43,7 @@ import {
 import { SignOutAllDevicesDialog } from "@/components/common/confirmation-dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-
-interface Device {
-  _id: string;
-  deviceName: string;
-  deviceType: "web" | "mobile" | "tablet" | "tv" | "desktop" | "other";
-  platform: string;
-  browser?: string;
-  isVerified: boolean;
-  isTrusted: boolean;
-  isBlocked: boolean;
-  lastUsed: Date;
-  registeredAt: Date;
-  location?: {
-    country?: string;
-    city?: string;
-  };
-}
+import { Device } from "@/types/device";
 
 interface DeviceListProps {
   variant?: "card" | "compact" | "table";
@@ -459,12 +443,13 @@ export function DeviceList({
                 )}
               >
                 {filteredDevices.map((device) => {
-                  const isCurrentDevice = currentDevice?._id === device._id;
+                  const isCurrentDevice =
+                    currentDevice?._id.toString() === device._id.toString();
 
                   if (variant === "compact" || viewType === "list") {
                     return (
                       <DeviceCardCompact
-                        key={device._id}
+                        key={device._id.toString()}
                         device={device}
                         onRemove={(deviceId) =>
                           handleDeviceAction(deviceId, "remove")
@@ -482,7 +467,7 @@ export function DeviceList({
 
                   return (
                     <DeviceCard
-                      key={device._id}
+                      key={device._id.toString()}
                       device={device}
                       onRemove={(deviceId) =>
                         handleDeviceAction(deviceId, "remove")
@@ -533,7 +518,9 @@ export function DeviceList({
         open={showSignOutDialog}
         onOpenChange={setShowSignOutDialog}
         onConfirm={handleSignOutAllDevices}
-      />
+      >
+        <div />
+      </SignOutAllDevicesDialog>
     </>
   );
 }

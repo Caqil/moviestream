@@ -631,7 +631,9 @@ export function SessionManager({
         open={showSignOutDialog}
         onOpenChange={setShowSignOutDialog}
         onConfirm={terminateAllSessions}
-      />
+      >
+        <div />
+      </SignOutAllDevicesDialog>
     </>
   );
 }

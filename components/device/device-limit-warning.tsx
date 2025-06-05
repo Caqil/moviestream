@@ -50,7 +50,8 @@ export function DeviceLimitWarning({
   }
 
   const { remaining, limit, canAdd } = deviceLimitInfo;
-  const usagePercentage = (deviceCount / limit) * 100;
+  const safeLimit = limit || 1; // Provide default to avoid division by zero
+  const usagePercentage = (deviceCount / safeLimit) * 100;
   const isAtLimit = !canAdd;
   const isNearLimit = remaining <= 1 && remaining > 0;
 

@@ -190,13 +190,16 @@ export function ConfirmationDialog({
         )}
 
         {/* Don't ask again option */}
+        {/* Don't ask again option */}
         {showDontAskAgain && (
           <div className="px-6">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="dont-ask-again"
                 checked={dontAskAgain}
-                onCheckedChange={setDontAskAgain}
+                onCheckedChange={(checked) => {
+                  setDontAskAgain(checked === true);
+                }}
                 disabled={isLoading}
               />
               <Label
@@ -208,7 +211,6 @@ export function ConfirmationDialog({
             </div>
           </div>
         )}
-
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
           <AlertDialogCancel onClick={handleCancel} disabled={isLoading}>
             {cancelText}

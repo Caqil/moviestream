@@ -1,4 +1,3 @@
-
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface ISettings extends Document {
@@ -141,6 +140,12 @@ export interface ISettings extends Document {
     isEnabled: boolean;
     message: string;
     allowedIPs: string[];
+  };
+
+  // Migration Tracking
+  migration?: {
+    version: string;
+    lastMigrated: Date;
   };
   
   createdAt: Date;
@@ -332,6 +337,60 @@ const settingsSchema = new Schema<ISettings>({
     }
   },
   
+  // Device Management Settings
+  deviceManagement: {
+    globalDeviceLimit: {
+      type: Number,
+      default: 0 // 0 means use plan limits
+    },
+    enforceDeviceLimits: {
+      type: Boolean,
+      default: true
+    },
+    allowDeviceSharing: {
+      type: Boolean,
+      default: false
+    },
+    deviceInactivityDays: {
+      type: Number,
+      default: 90,
+      min: 1
+    },
+    requireDeviceVerification: {
+      type: Boolean,
+      default: true
+    },
+    autoBlockSuspiciousDevices: {
+      type: Boolean,
+      default: true
+    },
+    enableGeolocationCheck: {
+      type: Boolean,
+      default: false
+    },
+    maxSessionDuration: {
+      type: Number,
+      default: 24, // 24 hours
+      min: 1
+    },
+    allowSimultaneousStreams: {
+      type: Boolean,
+      default: true
+    },
+    kickPreviousSession: {
+      type: Boolean,
+      default: false
+    },
+    deviceTrustScoring: {
+      type: Boolean,
+      default: false
+    },
+    logDeviceActivity: {
+      type: Boolean,
+      default: true
+    }
+  },
+  
   // Features Settings
   features: {
     userRegistration: {
@@ -397,6 +456,18 @@ const settingsSchema = new Schema<ISettings>({
     allowedIPs: [{
       type: String
     }]
+  },
+
+  // Migration Tracking
+  migration: {
+    version: {
+      type: String,
+      default: '0.0.0'
+    },
+    lastMigrated: {
+      type: Date,
+      default: null
+    }
   }
 }, {
   timestamps: true
