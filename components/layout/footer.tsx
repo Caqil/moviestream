@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React from "react";
 import Link from "next/link";
@@ -359,7 +359,7 @@ export function Footer({ className, variant = "default" }: FooterProps) {
                 <IconGlobe className="h-4 w-4 text-muted-foreground" />
                 <Select
                   value={preferences.language}
-                  onValueChange={(language) => updatePreferences({ language })}
+                  onValueChange={(language: any) => updatePreferences({ language })}
                 >
                   <SelectTrigger className="w-32 h-8">
                     <SelectValue />
