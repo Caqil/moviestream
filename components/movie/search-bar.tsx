@@ -1,14 +1,13 @@
-// components/movie/search-bar.tsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useSearch } from "@/hooks/use-search";
+import { useDebounce } from "@/hooks/use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Command,
   CommandEmpty,
@@ -24,38 +23,49 @@ import {
 } from "@/components/ui/popover";
 import {
   IconSearch,
+  IconX,
   IconClock,
   IconTrendingUp,
-  IconX,
-  IconLoader,
   IconMovie,
-  IconStar,
-  IconCalendar,
+  IconUser,
+  IconHash,
+  IconLoader,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
   className?: string;
   placeholder?: string;
-  variant?: "default" | "compact" | "navbar";
+  variant?: "default" | "compact" | "minimal";
+  showSuggestions?: boolean;
+  showRecentSearches?: boolean;
   onSearch?: (query: string) => void;
-  autoFocus?: boolean;
+  onClose?: () => void;
+}
+
+interface SearchSuggestion {
+  type: "movie" | "genre" | "person" | "keyword";
+  id: string;
+  title: string;
+  subtitle?: string;
+  year?: number;
+  image?: string;
 }
 
 export function SearchBar({
   className,
-  placeholder = "Search movies and shows...",
+  placeholder = "Search movies, shows, genres...",
   variant = "default",
+  showSuggestions = true,
+  showRecentSearches = true,
   onSearch,
-  autoFocus = false,
+  onClose,
 }: SearchBarProps) {
   const router = useRouter();
   const {
-    results,
     suggestions,
     recentSearches,
     isLoading,
-    search,
     searchSuggestions,
     addToRecentSearches,
     clearRecentSearches,
@@ -63,301 +73,349 @@ export function SearchBar({
 
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [isFocused, setIsFocused] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Search when debounced query changes
+  // Fetch suggestions when debounced query changes
   useEffect(() => {
-    if (debouncedQuery.length > 0) {
+    if (debouncedQuery && showSuggestions) {
       searchSuggestions(debouncedQuery);
     }
-  }, [debouncedQuery, searchSuggestions]);
+  }, [debouncedQuery, searchSuggestions, showSuggestions]);
 
   // Handle search submission
-  const handleSearch = (searchQuery: string) => {
+  const handleSearch = (searchQuery: string = query) => {
     if (!searchQuery.trim()) return;
 
-    addToRecentSearches(searchQuery);
-    setIsOpen(false);
-    setQuery("");
+    const trimmedQuery = searchQuery.trim();
+    addToRecentSearches(trimmedQuery);
 
     if (onSearch) {
-      onSearch(searchQuery);
+      onSearch(trimmedQuery);
     } else {
-      router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      router.push(`/search?q=${encodeURIComponent(trimmedQuery)}`);
     }
-  };
 
-  // Handle input change
-  const handleInputChange = (value: string) => {
-    setQuery(value);
-    setSelectedIndex(-1);
-    if (value.length > 0) {
-      setIsOpen(true);
-    }
+    setQuery("");
+    setIsOpen(false);
+    onClose?.();
+    inputRef.current?.blur();
   };
 
   // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return;
-
-    const allItems = [
-      ...suggestions,
-      ...(recentSearches.length > 0 ? recentSearches : []),
-    ];
-
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < allItems.length - 1 ? prev + 1 : prev
-        );
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-        break;
-      case "Enter":
-        e.preventDefault();
-        if (selectedIndex >= 0 && allItems[selectedIndex]) {
-          handleSearch(allItems[selectedIndex]);
-        } else {
-          handleSearch(query);
-        }
-        break;
-      case "Escape":
-        setIsOpen(false);
-        setSelectedIndex(-1);
-        inputRef.current?.blur();
-        break;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    } else if (e.key === "Escape") {
+      setQuery("");
+      setIsOpen(false);
+      inputRef.current?.blur();
     }
   };
 
-  // Clear search
-  const clearSearch = () => {
-    setQuery("");
-    setIsOpen(false);
-    inputRef.current?.focus();
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion: SearchSuggestion | string) => {
+    const searchTerm =
+      typeof suggestion === "string" ? suggestion : suggestion.title;
+    handleSearch(searchTerm);
   };
 
-  if (variant === "compact") {
-    return (
-      <div className={cn("relative w-full", className)}>
-        <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            type="text"
-            placeholder={placeholder}
-            value={query}
-            onChange={(e) => handleInputChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
-            className="pl-10 pr-10"
-            autoFocus={autoFocus}
-          />
-          {query && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-              onClick={clearSearch}
-            >
-              <IconX className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Get search icon size based on variant
+  const getIconSize = () => {
+    switch (variant) {
+      case "compact":
+        return "h-4 w-4";
+      case "minimal":
+        return "h-3 w-3";
+      default:
+        return "h-4 w-4";
+    }
+  };
+
+  // Get input size based on variant
+  const getInputSize = () => {
+    switch (variant) {
+      case "compact":
+        return "h-8 text-sm";
+      case "minimal":
+        return "h-6 text-xs";
+      default:
+        return "h-10";
+    }
+  };
+
+  const shouldShowDropdown = isOpen && (!!query || showRecentSearches);
+  const hasResults = suggestions.length > 0 || recentSearches.length > 0;
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <div className={cn("relative w-full", className)}>
-        <div className="relative">
-          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            ref={inputRef}
-            type="text"
-            placeholder={placeholder}
-            value={query}
-            onChange={(e) => handleInputChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => setIsOpen(true)}
-            className={cn(
-              "pl-10 pr-10",
-              variant === "navbar" && "bg-background/50 border-muted"
-            )}
-            autoFocus={autoFocus}
-          />
-          {query && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-              onClick={clearSearch}
-            >
-              <IconX className="h-3 w-3" />
-            </Button>
-          )}
-          {isLoading && (
-            <IconLoader className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-          )}
-        </div>
-
-        {/* Search Results Dropdown */}
-        {isOpen && (
-          <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-popover border rounded-md shadow-lg">
-            <div className="max-h-96 overflow-y-auto">
-              {/* Search Suggestions */}
-              {suggestions.length > 0 && (
-                <div className="p-2">
-                  <div className="flex items-center gap-2 px-2 py-1 text-sm font-medium text-muted-foreground">
-                    <IconSearch className="h-4 w-4" />
-                    Suggestions
-                  </div>
-                  {suggestions.slice(0, 5).map((suggestion, index) => (
-                    <button
-                      key={suggestion}
+    <div className={cn("relative w-full max-w-md", className)}>
+      <Popover open={!!shouldShowDropdown} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          <div className="relative">
+            <IconSearch
+              className={cn(
+                "absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground",
+                getIconSize()
+              )}
+            />
+            <Input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => {
+                setIsFocused(true);
+                setIsOpen(true);
+              }}
+              onBlur={() => setIsFocused(false)}
+              placeholder={placeholder}
+              className={cn(
+                "pl-10 pr-10",
+                getInputSize(),
+                isFocused && "ring-2 ring-primary/20"
+              )}
+            />
+            {(query || isLoading) && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {isLoading ? (
+                  <IconLoader
+                    className={cn(
+                      "animate-spin text-muted-foreground",
+                      getIconSize()
+                    )}
+                  />
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setQuery("")}
+                    className="h-auto p-0 hover:bg-transparent"
+                  >
+                    <IconX
                       className={cn(
-                        "w-full text-left px-3 py-2 rounded-sm hover:bg-muted transition-colors",
-                        selectedIndex === index && "bg-muted"
+                        "text-muted-foreground hover:text-foreground",
+                        getIconSize()
                       )}
-                      onClick={() => handleSearch(suggestion)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <IconMovie className="h-4 w-4 text-muted-foreground" />
-                        <span>{suggestion}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Recent Searches */}
-              {recentSearches.length > 0 && suggestions.length === 0 && (
-                <div className="p-2">
-                  <div className="flex items-center justify-between px-2 py-1">
-                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      <IconClock className="h-4 w-4" />
-                      Recent Searches
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearRecentSearches}
-                      className="h-6 text-xs"
-                    >
-                      Clear
-                    </Button>
-                  </div>
-                  {recentSearches.slice(0, 5).map((search, index) => (
-                    <button
-                      key={search}
-                      className={cn(
-                        "w-full text-left px-3 py-2 rounded-sm hover:bg-muted transition-colors",
-                        selectedIndex === suggestions.length + index &&
-                          "bg-muted"
-                      )}
-                      onClick={() => handleSearch(search)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <IconClock className="h-4 w-4 text-muted-foreground" />
-                        <span>{search}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Movie Results */}
-              {results.length > 0 && (
-                <div className="p-2">
-                  <Separator className="mb-2" />
-                  <div className="flex items-center gap-2 px-2 py-1 text-sm font-medium text-muted-foreground">
-                    <IconMovie className="h-4 w-4" />
-                    Movies
-                  </div>
-                  {results.slice(0, 5).map((movie) => (
-                    <button
-                      key={movie._id}
-                      className="w-full text-left px-3 py-2 rounded-sm hover:bg-muted transition-colors"
-                      onClick={() => {
-                        setIsOpen(false);
-                        router.push(`/movies/${movie._id}`);
-                      }}
-                    >
-                      <div className="flex items-start gap-3">
-                        <img
-                          src={movie.poster}
-                          alt={movie.title}
-                          className="w-8 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium truncate">
-                            {movie.title}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>
-                              {new Date(movie.releaseDate).getFullYear()}
-                            </span>
-                            <div className="flex items-center gap-1">
-                              <IconStar className="h-3 w-3 text-yellow-500 fill-current" />
-                              <span>{movie.rating.toFixed(1)}</span>
-                            </div>
-                          </div>
-                        </div>
-                        {movie.isPremium && (
-                          <Badge variant="secondary" className="text-xs">
-                            Premium
-                          </Badge>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Empty State */}
-              {query &&
-                suggestions.length === 0 &&
-                results.length === 0 &&
-                recentSearches.length === 0 &&
-                !isLoading && (
-                  <div className="p-4 text-center text-muted-foreground">
-                    <IconSearch className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No results found for "{query}"</p>
-                    <p className="text-sm">Try searching for something else</p>
-                  </div>
+                    />
+                  </Button>
                 )}
-            </div>
+              </div>
+            )}
           </div>
+        </PopoverTrigger>
+
+        {shouldShowDropdown && (
+          <PopoverContent
+            className="w-full min-w-[var(--radix-popover-trigger-width)] p-0"
+            align="start"
+            side="bottom"
+          >
+            <Command>
+              <CommandList>
+                {/* Search Suggestions */}
+                {suggestions.length > 0 && (
+                  <CommandGroup heading="Suggestions">
+                    {suggestions.slice(0, 5).map((suggestion, index) => (
+                      <CommandItem
+                        key={`suggestion-${index}`}
+                        onSelect={() => handleSuggestionClick(suggestion)}
+                        className="flex items-center space-x-3 px-3 py-2"
+                      >
+                        <IconSearch className="h-4 w-4 text-muted-foreground" />
+                        <span className="flex-1 truncate">{suggestion}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
+                {/* Recent Searches */}
+                {showRecentSearches && recentSearches.length > 0 && !query && (
+                  <CommandGroup heading="Recent Searches">
+                    {recentSearches.slice(0, 5).map((search, index) => (
+                      <CommandItem
+                        key={`recent-${index}`}
+                        onSelect={() => handleSuggestionClick(search)}
+                        className="flex items-center space-x-3 px-3 py-2"
+                      >
+                        <IconClock className="h-4 w-4 text-muted-foreground" />
+                        <span className="flex-1 truncate">{search}</span>
+                      </CommandItem>
+                    ))}
+                    {recentSearches.length > 0 && (
+                      <div className="px-3 py-2 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearRecentSearches}
+                          className="h-auto p-0 text-xs text-muted-foreground hover:text-destructive"
+                        >
+                          Clear recent searches
+                        </Button>
+                      </div>
+                    )}
+                  </CommandGroup>
+                )}
+
+                {/* Trending Searches */}
+                {!query && (
+                  <CommandGroup heading="Trending">
+                    {[
+                      "Action Movies",
+                      "Marvel",
+                      "Comedy",
+                      "Horror",
+                      "Sci-Fi",
+                    ].map((trend) => (
+                      <CommandItem
+                        key={trend}
+                        onSelect={() => handleSuggestionClick(trend)}
+                        className="flex items-center space-x-3 px-3 py-2"
+                      >
+                        <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
+                        <span className="flex-1">{trend}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                )}
+
+                {/* Empty State */}
+                {query && suggestions.length === 0 && !isLoading && (
+                  <CommandEmpty className="py-6 text-center text-sm text-muted-foreground">
+                    No results found for "{query}"
+                  </CommandEmpty>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
         )}
+      </Popover>
+    </div>
+  );
+}
+
+// Navbar variant of the search bar
+export function NavbarSearchBar({
+  className,
+  ...props
+}: Omit<SearchBarProps, "variant">) {
+  return (
+    <SearchBar
+      variant="compact"
+      className={cn("w-64 lg:w-80", className)}
+      {...props}
+    />
+  );
+}
+
+// Mobile search overlay
+export function MobileSearchOverlay({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center space-x-4">
+          <SearchBar
+            className="flex-1"
+            placeholder="Search movies, shows, genres..."
+            onSearch={() => onClose()}
+          />
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <IconX className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
-    </Popover>
+    </div>
   );
 }
 
-// Navbar-specific search component
-export function NavbarSearchBar({ className }: { className?: string }) {
+// Quick search for admin panels
+export function QuickSearch({
+  onSelect,
+  placeholder = "Quick search...",
+}: {
+  onSelect: (item: any) => void;
+  placeholder?: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <SearchBar
-      variant="navbar"
-      placeholder="Search movies..."
-      className={cn("w-64", className)}
-    />
+    <Command className="rounded-lg border shadow-md">
+      <CommandInput
+        placeholder={placeholder}
+        value={query}
+        onValueChange={setQuery}
+      />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Movies">
+          {/* Add your search results here */}
+        </CommandGroup>
+      </CommandList>
+    </Command>
   );
 }
 
-// Page-specific search component
-export function PageSearchBar({ className }: { className?: string }) {
+// Search filters component
+export function SearchFilters({
+  filters,
+  onFilterChange,
+}: {
+  filters: any;
+  onFilterChange: (filters: any) => void;
+}) {
   return (
-    <SearchBar
-      variant="default"
-      placeholder="Search for movies, shows, actors..."
-      className={cn("max-w-2xl", className)}
-      autoFocus
-    />
+    <div className="flex flex-wrap items-center gap-2">
+      <Badge variant="outline" className="cursor-pointer">
+        <IconMovie className="h-3 w-3 mr-1" />
+        Movies
+      </Badge>
+      <Badge variant="outline" className="cursor-pointer">
+        <IconUser className="h-3 w-3 mr-1" />
+        People
+      </Badge>
+      <Badge variant="outline" className="cursor-pointer">
+        <IconHash className="h-3 w-3 mr-1" />
+        Genres
+      </Badge>
+    </div>
   );
 }

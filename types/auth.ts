@@ -1,3 +1,4 @@
+// types/auth.ts
 import { Types } from 'mongoose';
 
 export interface AuthUser {
@@ -7,6 +8,7 @@ export interface AuthUser {
   image?: string;
   role: 'admin' | 'subscriber' | 'guest';
   isActive: boolean;
+  watchlist: Types.ObjectId[]; // Add this property
   subscription?: {
     status: 'active' | 'canceled' | 'expired' | 'trial';
     planId: Types.ObjectId;

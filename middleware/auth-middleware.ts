@@ -26,7 +26,7 @@ export interface AuthenticatedRequest extends NextRequest {
 
 export class AuthMiddleware {
   // Main authentication middleware
-  static async authenticate(request: NextRequest): Promise<{
+ static async authenticate(request: NextRequest): Promise<{
     user: AuthUser | null;
     device: any | null;
     session: any | null;
@@ -47,8 +47,11 @@ export class AuthMiddleware {
       const decoded = EncryptionUtils.verifyAccessToken(token);
       const userId = decoded.userId;
 
-      // Get user from database
-      const user = await User.findById(userId).select('-password');
+      // Get user from database - populate watchlist
+      const user = await User.findById(userId)
+        .select('-password')
+        .populate('watchlist'); // Add this to get watchlist data
+        
       if (!user || !user.isActive) {
         return { user: null, device: null, session: null, error: 'User not found or inactive' };
       }
@@ -85,6 +88,11 @@ export class AuthMiddleware {
           image: user.image,
           role: user.role,
           isActive: user.isActive,
+          watchlist: Array.isArray(user.watchlist)
+            ? user.watchlist.map((id: any) =>
+                typeof id === 'string' ? new Types.ObjectId(id) : id
+              )
+            : [],
           subscription: user.subscription ? {
             status: user.subscription.status,
             planId: user.subscription.planId as unknown as Types.ObjectId,

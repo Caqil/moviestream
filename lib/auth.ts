@@ -1,3 +1,4 @@
+
 import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -14,6 +15,7 @@ declare module 'next-auth' {
     name: string;
     image?: string;
     role: 'admin' | 'subscriber' | 'guest';
+    watchlist: string[];
   }
 
   interface Session {
@@ -23,6 +25,7 @@ declare module 'next-auth' {
       name: string;
       image?: string;
       role: 'admin' | 'subscriber' | 'guest';
+      watchlist: string[];
     };
   }
 }
@@ -31,6 +34,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     role: string;
     userId: string;
+    watchlist: string[];
   }
 }
 
@@ -97,6 +101,7 @@ export const authOptions: NextAuthOptions = {
           name: profile.name || profile.email?.split('@')[0] || 'Apple User',
           image: undefined,
           role: 'guest' as const,
+          watchlist: [], // Add empty watchlist for new users
         };
       },
     },
@@ -114,7 +119,10 @@ export const authOptions: NextAuthOptions = {
         await connectToDatabase();
         
         // Find user and explicitly select password field
-        const user = await User.findOne({ email: credentials.email }).select('+password');
+        const user = await User.findOne({ email: credentials.email })
+          .select('+password')
+          .populate('watchlist');
+          
         if (!user) {
           return null;
         }
@@ -139,6 +147,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image,
           role: user.role,
+          watchlist: (user.watchlist || []).map((id: any) => id.toString()), // Convert ObjectIds to strings
         };
       },
     }),
@@ -149,6 +158,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = user.role;
         token.userId = user.id;
+        token.watchlist = user.watchlist || [];
       }
       
       // Return previous token if the access token has not expired yet
@@ -158,15 +168,17 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         session.user.id = token.userId as string;
         session.user.role = token.role as 'admin' | 'subscriber' | 'guest';
+        session.user.watchlist = token.watchlist as string[];
         
         // Fetch fresh user data from database to ensure up-to-date info
         try {
           await connectToDatabase();
-          const dbUser = await User.findById(token.userId);
+          const dbUser = await User.findById(token.userId).populate('watchlist');
           if (dbUser) {
             session.user.role = dbUser.role;
             session.user.name = dbUser.name;
             session.user.image = dbUser.image;
+            session.user.watchlist = (dbUser.watchlist || []).map((id: any) => id.toString());
           }
         } catch (error) {
           console.error('Error fetching user in session callback:', error);
@@ -179,7 +191,7 @@ export const authOptions: NextAuthOptions = {
         await connectToDatabase();
         
         // Check if user exists, create if not
-        const existingUser = await User.findOne({ email: user.email });
+        const existingUser = await User.findOne({ email: user.email }).populate('watchlist');
         
         if (!existingUser) {
           const newUser = await User.create({
@@ -209,10 +221,12 @@ export const authOptions: NextAuthOptions = {
           // Update the user object with the role from database
           user.role = newUser.role;
           user.id = newUser._id.toString();
+          user.watchlist = [];
         } else {
           // Update the user object with the role from database
           user.role = existingUser.role;
           user.id = existingUser._id.toString();
+          user.watchlist = (existingUser.watchlist || []).map((id: any) => id.toString());
           
           // Update last login and other info
           await User.findByIdAndUpdate(existingUser._id, {
@@ -344,6 +358,7 @@ export async function createUser(userData: {
     email: user.email,
     name: user.name,
     role: user.role,
+    watchlist: [],
   };
 }
 
@@ -366,7 +381,7 @@ export async function updateUserRole(userId: string, role: 'admin' | 'subscriber
 export async function getUserById(userId: string) {
   await connectToDatabase();
   
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).populate('watchlist');
   if (!user) {
     return null;
   }
@@ -380,5 +395,6 @@ export async function getUserById(userId: string) {
     isActive: user.isActive,
     lastLogin: user.lastLogin,
     createdAt: user.createdAt,
+    watchlist: (user.watchlist || []).map((id: any) => id.toString()),
   };
 }

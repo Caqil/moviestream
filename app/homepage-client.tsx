@@ -514,7 +514,7 @@ function HomepageContent() {
                 <CarouselContent className="-ml-2 md:-ml-4">
                   {section.movies.map((movie, index) => (
                     <CarouselItem
-                      key={movie._id}
+                      key={movie._id.toString()} // Convert ObjectId to string
                       className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                     >
                       <MovieCard

@@ -11,6 +11,7 @@ interface ExtendedUser {
   name: string;
   image?: string;
   role: 'admin' | 'subscriber' | 'guest';
+  watchlist: string[]; // Add watchlist property
   subscription?: {
     status: 'active' | 'canceled' | 'expired' | 'trial';
     planId: string;
@@ -38,6 +39,7 @@ export function useAuth() {
     image: sessionUser.image,
     role: sessionUser.role,
     isActive: true, // Assume active if session exists
+    watchlist: (sessionUser.watchlist || []).map(id => new Types.ObjectId(id)),
     subscription: sessionUser.subscription ? {
       status: sessionUser.subscription.status,
       planId: new Types.ObjectId(sessionUser.subscription.planId),

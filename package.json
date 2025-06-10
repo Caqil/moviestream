@@ -52,6 +52,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jest": "^29.5.8",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
@@ -104,6 +105,7 @@
     "cmdk": "^1.1.1",
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.6.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.303.0",
     "mongodb": "^6.17.0",
     "mongoose": "^8.1.0",

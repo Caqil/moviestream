@@ -54,7 +54,7 @@ try {
 // Enhanced GET handler
 export async function GET(
   request: NextRequest, 
-  context: { params: { nextauth: string[] } }
+  context: { params: Promise<{ nextauth: string[] }> }
 ): Promise<NextResponse> {
   try {
     // Check if handler is available
@@ -66,9 +66,12 @@ export async function GET(
     // Initialize database connection
     await initializeAuth();
     
+    // Await params before accessing properties
+    const params = await context.params;
+    const { nextauth } = params;
+    
     // Log authentication request for debugging (in development)
     if (process.env.NODE_ENV === 'development') {
-      const { nextauth } = context.params;
       console.log(`[NextAuth] GET ${nextauth?.join('/')}`);
     }
     
@@ -99,7 +102,7 @@ export async function GET(
 // Enhanced POST handler
 export async function POST(
   request: NextRequest, 
-  context: { params: { nextauth: string[] } }
+  context: { params: Promise<{ nextauth: string[] }> }
 ): Promise<NextResponse> {
   try {
     // Check if handler is available
@@ -111,8 +114,9 @@ export async function POST(
     // Initialize database connection
     await initializeAuth();
     
-    // Extract request details for logging
-    const { nextauth } = context.params;
+    // Await params before accessing properties
+    const params = await context.params;
+    const { nextauth } = params;
     const endpoint = nextauth?.join('/');
     
     // Log authentication request for debugging (in development)
@@ -156,7 +160,8 @@ export async function POST(
     console.error('NextAuth POST error:', error);
     
     // Log security-related errors with context
-    const { nextauth } = context.params;
+    const params = await context.params;
+    const { nextauth } = params;
     const endpoint = nextauth?.join('/');
     
     if (error instanceof Error) {
@@ -208,6 +213,3 @@ export async function HEAD(): Promise<NextResponse> {
     });
   }
 }
-
-// Export the handler as default for compatibility
-export { handler as default };

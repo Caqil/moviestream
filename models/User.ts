@@ -48,7 +48,7 @@ const userSchema = new Schema<IUser>({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, // Remove this to avoid duplicate with index
     lowercase: true,
     trim: true
   },
@@ -60,6 +60,10 @@ const userSchema = new Schema<IUser>({
   image: {
     type: String,
     default: null
+  },
+  password: {
+    type: String,
+    select: false // Don't include password by default
   },
   role: {
     type: String,
@@ -183,11 +187,25 @@ const userSchema = new Schema<IUser>({
   timestamps: true
 });
 
-// Indexes
-userSchema.index({ email: 1 });
+// Define indexes separately to avoid duplicates
+// Primary indexes
+//userSchema.index({ email: 1 }, { unique: true });
+
+// Query optimization indexes
 userSchema.index({ role: 1 });
+userSchema.index({ isActive: 1 });
+userSchema.index({ emailVerified: 1 });
+userSchema.index({ lastLogin: -1 });
+userSchema.index({ createdAt: -1 });
+userSchema.index({ activeSessions: 1 });
+
+// Subscription-related indexes
 userSchema.index({ 'subscription.status': 1 });
 userSchema.index({ 'subscription.stripeCustomerId': 1 });
+userSchema.index({ 'subscription.stripeSubscriptionId': 1 });
+
+// Compound indexes for common queries
+userSchema.index({ role: 1, isActive: 1 });
+userSchema.index({ 'subscription.status': 1, isActive: 1 });
 
 export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', userSchema);
-
